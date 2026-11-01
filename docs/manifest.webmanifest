@@ -1,0 +1,14 @@
+{
+  "name": "TI News",
+  "short_name": "TI News",
+  "description": "Notícias de tecnologia e programação, traduzidas para português.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b57d0",
+  "theme_color": "#0b57d0",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

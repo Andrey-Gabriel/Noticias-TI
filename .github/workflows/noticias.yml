@@ -1,0 +1,47 @@
+name: Atualizar portal e enviar e-mail
+
+on:
+  schedule:
+    # 11:00 UTC = 08:00 em Brasília: atualiza o site E envia o e-mail diário.
+    - cron: "0 11 * * *"
+    # 05:00, 17:00 e 23:00 UTC = 02:00, 14:00 e 20:00 em Brasília: só atualiza o site.
+    - cron: "0 5,17,23 * * *"
+  workflow_dispatch:   # botão "Run workflow": atualiza o site e envia o e-mail (bom para testar)
+
+permissions:
+  contents: write      # necessário para salvar docs/, vistas.json e fila_email.json no repositório
+
+concurrency:
+  group: noticias
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Buscar notícias, atualizar o site e (às 8h) enviar o e-mail
+        env:
+          EMAIL_REMETENTE: ${{ secrets.EMAIL_REMETENTE }}
+          EMAIL_SENHA_APP: ${{ secrets.EMAIL_SENHA_APP }}
+          EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
+          SITE_URL: ${{ vars.SITE_URL }}
+          ENVIAR_EMAIL: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '0 11 * * *' }}
+        run: python noticias_ti.py
+
+      - name: Salvar site, histórico e fila no repositório
+        if: always()
+        run: |
+          git config user.name "noticias-bot"
+          git config user.email "noticias-bot@users.noreply.github.com"
+          git add docs vistas.json fila_email.json || true
+          git diff --cached --quiet || (git commit -m "Atualiza portal de notícias" && git pull --rebase && git push)

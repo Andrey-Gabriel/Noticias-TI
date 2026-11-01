@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TI News</title>
+<meta name="description" content="Notícias de tecnologia e programação do Brasil e do mundo, traduzidas para português.">
+<meta name="theme-color" content="#0b57d0">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #f4f5f7; --card: #ffffff; --text: #14171a; --muted: #636b76;
+    --line: #e3e6ea; --brand: #0b57d0; --chip: #e9edf3; --shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1216; --card: #181c22; --text: #eceff3; --muted: #9aa3ae;
+    --line: #272d35; --brand: #7aa7ff; --chip: #232932; --shadow: none;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1216; --card: #181c22; --text: #eceff3; --muted: #9aa3ae;
+      --line: #272d35; --brand: #7aa7ff; --chip: #232932; --shadow: none;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.4;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+
+  /* Cabeçalho */
+  header { position: sticky; top: 0; z-index: 10; background: var(--card); border-bottom: 1px solid var(--line); }
+  .topo { display: flex; align-items: center; gap: 12px; padding: 10px 0; }
+  .logo { font-weight: 800; font-size: 24px; letter-spacing: -.5px; color: var(--brand); }
+  .logo span { color: var(--text); }
+  .data { color: var(--muted); font-size: 13px; display: none; }
+  .busca { flex: 1 1 0; max-width: 360px; min-width: 0; margin-left: auto; }
+  input[type=search], select {
+    width: 100%; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--text); font: inherit; font-size: 15px;
+  }
+  .btn {
+    border: 1px solid var(--line); background: var(--bg); color: var(--text); border-radius: 10px;
+    padding: 8px 11px; font-size: 16px; cursor: pointer;
+  }
+  nav { display: flex; gap: 8px; overflow-x: auto; padding: 0 0 10px; scrollbar-width: none; }
+  nav::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: none; border: 0; background: var(--chip); color: var(--text); padding: 7px 14px;
+    border-radius: 999px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .chip[aria-pressed="true"] { background: var(--brand); color: #fff; }
+  :root[data-theme="dark"] .chip[aria-pressed="true"] { color: #0b1220; }
+
+  main { padding: 18px 0 40px; }
+  .filtros { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
+  .filtros select { max-width: 240px; }
+  .contagem { color: var(--muted); font-size: 13px; }
+  h2.secao { font-size: 14px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 26px 0 12px; }
+
+  /* Cards */
+  .card {
+    display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--line);
+    border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); transition: transform .15s;
+  }
+  .card:hover { transform: translateY(-2px); }
+  .media {
+    aspect-ratio: 16 / 9; background: linear-gradient(135deg, var(--cc), color-mix(in srgb, var(--cc) 35%, #000));
+    position: relative; overflow: hidden;
+  }
+  .media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .tag { align-self: flex-start; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--cc); }
+  .card h3 { margin: 0; font-size: 17px; line-height: 1.25; overflow-wrap: anywhere; }
+  .resumo { margin: 0; color: var(--muted); font-size: 14px;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .meta { margin-top: auto; padding-top: 4px; color: var(--muted); font-size: 12px; }
+
+  .grade { display: grid; gap: 16px; grid-template-columns: 1fr; }
+  .hero { display: grid; gap: 16px; grid-template-columns: 1fr; }
+  .hero .principal h3 { font-size: 24px; }
+  .hero .lateral { display: grid; gap: 16px; grid-template-columns: 1fr; }
+
+  @media (min-width: 600px) {
+    .grade { grid-template-columns: repeat(2, 1fr); }
+    .hero .lateral { grid-template-columns: repeat(2, 1fr); }
+    .data { display: block; }
+  }
+  @media (min-width: 960px) {
+    .grade { grid-template-columns: repeat(3, 1fr); }
+    .hero { grid-template-columns: 2fr 1fr; }
+    .hero .lateral { grid-template-columns: 1fr; }
+    .hero .principal h3 { font-size: 30px; }
+    /* a imagem do destaque ocupa a altura que sobrar, sem deixar espaço vazio */
+    .hero .principal .media { aspect-ratio: auto; flex: 1; min-height: 280px; }
+    .hero .principal .body { flex: 0 0 auto; }
+    .hero .lateral .media { aspect-ratio: 2 / 1; }
+    .hero .lateral .resumo { display: none; }
+  }
+  @media (min-width: 1200px) { .grade { grid-template-columns: repeat(4, 1fr); } }
+
+  .mais { display: block; margin: 26px auto 0; padding: 11px 26px; border-radius: 999px; border: 1px solid var(--line);
+    background: var(--card); color: var(--text); font: inherit; font-weight: 600; cursor: pointer; }
+  .vazio { text-align: center; color: var(--muted); padding: 60px 0; }
+  footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; padding: 18px 0 30px; }
+  :focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="topo">
+      <a class="logo" href="./" aria-label="TI News, início">TI<span>News</span></a>
+      <span class="data" id="hoje"></span>
+      <div class="busca"><input type="search" id="busca" placeholder="Buscar notícias…" aria-label="Buscar notícias"></div>
+      <button class="btn" id="tema" type="button" aria-label="Alternar tema claro/escuro" title="Alternar tema">🌓</button>
+    </div>
+    <nav id="categorias" aria-label="Categorias"></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="filtros">
+    <select id="fonte" aria-label="Filtrar por fonte"></select>
+    <span class="contagem" id="contagem"></span>
+  </div>
+  <div id="destaques"></div>
+  <div id="lista"></div>
+  <button class="mais" id="mais" type="button" hidden>Carregar mais notícias</button>
+</main>
+
+<footer>
+  <div class="wrap">
+    Atualizado em <span id="atualizado"></span>. Notícias em outros idiomas são traduzidas automaticamente;
+    abra o link original em caso de dúvida. Todo o conteúdo pertence às fontes citadas.
+  </div>
+</footer>
+
+<script>
+const DADOS = __NOTICIAS_JSON__;
+const ATUALIZADO = "__ATUALIZADO__";
+
+const CORES = { "Programação": "#0b57d0", "Tecnologia": "#7c3aed", "Segurança": "#dc2626", "IA": "#059669", "Startups": "#d97706" };
+const POR_PAGINA = 24;
+const estado = { cat: "Todas", fonte: "", busca: "", pagina: 1 };
+
+const $ = (s) => document.querySelector(s);
+const semAcento = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+DADOS.forEach((n) => { n._busca = semAcento(n.titulo + " " + n.resumo + " " + n.fonte); });
+
+function el(tag, cls, texto) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (texto !== undefined) e.textContent = texto;
+  return e;
+}
+const urlSegura = (u) => (/^https?:\/\//i.test(u || "") ? u : "");
+
+function tempo(iso) {
+  const diff = (new Date(iso) - Date.now()) / 1000, abs = Math.abs(diff);
+  const rtf = new Intl.RelativeTimeFormat("pt-BR", { numeric: "auto" });
+  if (abs < 3600) return rtf.format(Math.round(diff / 60), "minute");
+  if (abs < 86400) return rtf.format(Math.round(diff / 3600), "hour");
+  return rtf.format(Math.round(diff / 86400), "day");
+}
+
+function card(n, tipo) {
+  const a = el("a", "card " + (tipo || ""));
+  a.href = urlSegura(n.link) || "#";
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  a.style.setProperty("--cc", CORES[n.categoria] || "#475569");
+
+  const media = el("div", "media");
+  const src = urlSegura(n.imagem);
+  if (src) {
+    const img = new Image();
+    img.loading = "lazy"; img.alt = ""; img.referrerPolicy = "no-referrer";
+    img.onerror = () => img.remove();
+    img.src = src;
+    media.append(img);
+  }
+  a.append(media);
+
+  const corpo = el("div", "body");
+  corpo.append(el("span", "tag", n.categoria));
+  corpo.append(el("h3", "", n.titulo));
+  if (n.resumo) corpo.append(el("p", "resumo", n.resumo));
+  corpo.append(el("div", "meta", n.fonte + " · " + tempo(n.data) + (n.traduzida ? " · 🌐 traduzida" : "")));
+  a.append(corpo);
+  return a;
+}
+
+function filtrar() {
+  const termos = semAcento(estado.busca).split(/\s+/).filter(Boolean);
+  return DADOS.filter((n) =>
+    (estado.cat === "Todas" || n.categoria === estado.cat) &&
+    (!estado.fonte || n.fonte === estado.fonte) &&
+    termos.every((t) => n._busca.includes(t))
+  );
+}
+
+function render() {
+  const lista = filtrar();
+  const destaques = $("#destaques"), area = $("#lista");
+  destaques.replaceChildren(); area.replaceChildren();
+  $("#contagem").textContent = lista.length + (lista.length === 1 ? " notícia" : " notícias");
+
+  if (!lista.length) {
+    area.append(el("div", "vazio", "Nenhuma notícia encontrada."));
+    $("#mais").hidden = true;
+    return;
+  }
+
+  let resto = lista;
+  const semFiltro = estado.cat === "Todas" && !estado.fonte && !estado.busca;
+  if (semFiltro && lista.length >= 3) {
+    const principal = lista.slice(0, 12).find((n) => urlSegura(n.imagem)) || lista[0];
+    const laterais = lista.filter((n) => n !== principal).slice(0, 2);
+    const hero = el("div", "hero");
+    hero.append(card(principal, "principal"));
+    const lat = el("div", "lateral");
+    laterais.forEach((n) => lat.append(card(n)));
+    hero.append(lat);
+    destaques.append(hero);
+    resto = lista.filter((n) => n !== principal && !laterais.includes(n));
+    if (resto.length) destaques.append(el("h2", "secao", "Últimas notícias"));
+  }
+
+  const visiveis = resto.slice(0, POR_PAGINA * estado.pagina);
+  const grade = el("div", "grade");
+  visiveis.forEach((n) => grade.append(card(n)));
+  area.append(grade);
+  $("#mais").hidden = visiveis.length >= resto.length;
+}
+
+function montarFiltros() {
+  const cats = ["Todas", ...new Set(DADOS.map((n) => n.categoria))];
+  const nav = $("#categorias");
+  cats.forEach((c) => {
+    const b = el("button", "chip", c);
+    b.type = "button";
+    b.setAttribute("aria-pressed", String(c === estado.cat));
+    b.onclick = () => {
+      estado.cat = c; estado.pagina = 1;
+      nav.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      render();
+    };
+    nav.append(b);
+  });
+
+  const sel = $("#fonte");
+  sel.append(new Option("Todas as fontes", ""));
+  [...new Set(DADOS.map((n) => n.fonte))].sort().forEach((f) => sel.append(new Option(f, f)));
+  sel.onchange = () => { estado.fonte = sel.value; estado.pagina = 1; render(); };
+}
+
+let timer;
+$("#busca").addEventListener("input", (e) => {
+  clearTimeout(timer);
+  timer = setTimeout(() => { estado.busca = e.target.value; estado.pagina = 1; render(); }, 200);
+});
+$("#mais").onclick = () => { estado.pagina++; render(); };
+
+$("#tema").onclick = () => {
+  const root = document.documentElement;
+  const escuro = root.dataset.theme
+    ? root.dataset.theme === "dark"
+    : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = escuro ? "light" : "dark";
+  try { localStorage.setItem("tema", root.dataset.theme); } catch (e) {}
+};
+try {
+  const salvo = localStorage.getItem("tema");
+  if (salvo === "dark" || salvo === "light") document.documentElement.dataset.theme = salvo;
+} catch (e) {}
+
+$("#hoje").textContent = new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" });
+$("#atualizado").textContent = new Date(ATUALIZADO).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+montarFiltros();
+render();
+</script>
+</body>
+</html>
